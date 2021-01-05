@@ -1,8 +1,27 @@
 
 function timelog(req, res, next) {
-    const reqTime = new Date()
-    const resTime = new Date()
+    let reqTime = new Date()
     let now = reqTime
+
+    res.on('finish', () => {
+        let resTime = new Date()
+        now = resTime
+        const timeDiff = +resTime - +reqTime
+        console.log(`需求時間: ${formatDateType(reqTime)} | ${route(req)} | 回傳時間:${formatDateType(resTime)} | total time: ${timeDiff}ms `)
+    })
+
+    next()
+}
+
+function route(req) {
+    const path = req.originalUrl
+    const method = req.method
+
+    return method + ' from ' + path
+}
+
+
+function formatDateType(now) {
 
     const year = now.getYear() + 1900
     const month = now.getMonth() + 1
@@ -17,19 +36,8 @@ function timelog(req, res, next) {
         + (minutes < 10 ? "0" + minutes : minutes)
         + ":"
         + (seconds < 10 ? "0" + seconds : seconds)
-
-    // console.log('test')
-    console.log(time + " " + route(req))
-    next()
+    return time
 }
-
-function route(req) {
-    const path = req.originalUrl
-    const method = req.method
-
-    return method + ' from ' + path
-}
-
 
 module.exports = { timelog }
 
